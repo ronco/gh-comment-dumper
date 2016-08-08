@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'octokit'
 
-class CommentDumper
+class CommentFetcher
 
   attr_accessor :repo, :start_time, :end_time
 
@@ -20,22 +20,22 @@ class CommentDumper
   end
 
   def pulls=(new_pulls)
-    comments = nil
+    self.comments = nil
     @pulls = new_pulls
   end
 
   def repo=(new_repo)
-    pulls = nil
+    self.pulls = nil
     @repo = new_repo
   end
 
   def start_time=(new_start_time)
-    pulls = nil
+    self.pulls = nil
     @start_time = new_start_time
   end
 
   def end_time=(new_end_time)
-    pulls = nil
+    self.pulls = nil
     @end_time = new_end_time
   end
 
@@ -45,6 +45,12 @@ class CommentDumper
 
   def comments=(new_comments)
     @comments = new_comments
+  end
+
+  def each
+    comments.each do |comment_info|
+      yield(comment_info[:comment], comment_info[:pull])
+    end
   end
 
   private
@@ -99,11 +105,3 @@ class CommentDumper
     comments
   end
 end
-
-# [80] pry(main)> csv_string = CSV.open('test.csv', 'wb') do |csv|
-# [80] pry(main)*   csv << ["Repo", "Pull Request #", "Author", "Commenter", "Comment"]
-# [80] pry(main)*   all_comments.flatten.each do |c|
-# [80] pry(main)*     pull = pulls_by_url[c.pull_request_url]
-# [80] pry(main)*     csv << ["=HYPERLINK(\"#{pull.base.repo.html_url}\", \"#{pull.base.repo.full_name}\")", "=HYPERLINK(\"#{pull.html_url}\", \"#{pull.number}\")", pull.user.login, c.user.login, c.body]
-# [80] pry(main)*   end
-# [80] pry(main)* end; nil
